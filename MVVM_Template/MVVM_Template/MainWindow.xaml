@@ -1,0 +1,23 @@
+﻿<Window x:Class="MVVM_Template.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:MVVM_Template.ViewModels"
+        mc:Ignorable="d"
+        Title="{Binding Title}" Height="450" Width="800">
+    <Window.DataContext>
+        <vm:MainViewModel/>
+    </Window.DataContext>
+
+    <StackPanel>
+        <Button Content="Clcik Me" CommandParameter="10" Command="{Binding TestCommand}" />
+        <Button Content="Clcik Me" Command="{Binding TestCommand1}"/>
+        <Button Content="Clcik Me" Command="{Binding TestCommand2}"/>
+        <Button Content="Cancel" Command="{Binding TestCommand2.Cancel}"/>
+        <TextBlock Text="{Binding Counter}"/>
+        <ProgressBar Height="100" Maximum="1" Value="{Binding TestCommand2.ProgressValue}"/>
+        <Button Content="Close" Command="{StaticResource CloseWindowCommand}"
+                CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+    </StackPanel>
+</Window>
