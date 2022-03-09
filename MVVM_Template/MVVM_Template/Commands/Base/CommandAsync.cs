@@ -16,8 +16,9 @@ public class CommandAsync : CommandBase
     #region Command Cancel
     private ICommand? _cancel;
     public ICommand Cancel => _cancel ??= new SimpleCommand(
-        execute: () => _cts.Cancel()
-        );
+        execute: () => _cts.Cancel(),
+        canExecute: () => IsExecuting is true
+    );
     #endregion
 
     #region NotifyProperty <bool> IsExecuting

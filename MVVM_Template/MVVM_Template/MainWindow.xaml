@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:MVVM_Template.ViewModels"
+        xmlns:converters="clr-namespace:MVVM_Template.Converters"
         mc:Ignorable="d"
         Title="{Binding Title}" Height="450" Width="800">
     <Window.DataContext>
@@ -16,8 +17,16 @@
         <Button Content="Clcik Me" Command="{Binding TestCommand2}"/>
         <Button Content="Cancel" Command="{Binding TestCommand2.Cancel}"/>
         <TextBlock Text="{Binding Counter}"/>
-        <ProgressBar Height="100" Maximum="1" Value="{Binding TestCommand2.ProgressValue}"/>
+        <ProgressBar Height="100" Maximum="1" Value="{Binding TestCommand2.ProgressValue}" Visibility="{Binding ProgressBarEnable, Converter={converters:BoolToVisibilityConverter Inverted=False}}"/>
         <Button Content="Close" Command="{StaticResource CloseWindowCommand}"
                 CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+        <Button Content="Double Close">
+            <Button.InputBindings>
+                <MouseBinding Gesture="LeftDoubleClick"
+                              Command="{StaticResource CloseWindowCommand}" 
+                              CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
+            </Button.InputBindings>
+        </Button>
+
     </StackPanel>
 </Window>

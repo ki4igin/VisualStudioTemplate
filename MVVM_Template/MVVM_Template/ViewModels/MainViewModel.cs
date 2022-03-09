@@ -1,4 +1,5 @@
 ﻿using MVVM_Template.Commands.Base;
+using MVVM_Template.ViewModels.Base;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,32 +9,44 @@ namespace MVVM_Template.ViewModels;
 
 public class MainViewModel : TitledViewModel
 {
-
-    #region NotifyProperty<int> Counter
+    #region NotifyProperty <int> Counter
     private int _counter;
-    public int Counter { get => _counter; set => Set(ref _counter, value); }
+    public int Counter
+    {
+        get => _counter;
+        set
+        {
+            if (Set(ref _counter, value))
+                ProgressBarEnable = (value % 2) == 0;
+        }
+    }
     #endregion
 
-
-    #region NotifyProperty<double> ProgressValue
+    #region NotifyProperty <double> ProgressValue
     private double _progressValue;
     public double ProgressValue { get => _progressValue; set => Set(ref _progressValue, value); }
     #endregion
 
 
+    #region NotifyProperty <bool> ProgressBarEnable
+    private bool _progressBarEnable;
+    public bool ProgressBarEnable { get => _progressBarEnable; set => Set(ref _progressBarEnable, value); }
+    #endregion
 
-    private SimpleCommand<string>? _testCommand;
-    public SimpleCommand<string> TestCommand => _testCommand ??= new(
+
+
+    private ICommand? _testCommand;
+    public ICommand TestCommand => _testCommand ??= new SimpleCommand<string>(
         execute: async (val) =>
         {
             Counter++;
-           await Task.Delay(1000);
+            await Task.Delay(1000);
         },
         canExecute: () => Counter % 2 == 0
-        );
+     );
 
-    private SimpleCommand? _testCommand1;
-    public SimpleCommand TestCommand1 =>
+    private ICommand? _testCommand1;
+    public ICommand TestCommand1 =>
         _testCommand1 ??= new SimpleCommand(
             execute: () => Counter++
         );
@@ -41,35 +54,13 @@ public class MainViewModel : TitledViewModel
     //CancellationTokenSource _cts;
 
     private ICommand? _testCommand2;
-    public ICommand TestCommand2 =>
-        _testCommand2 ??= new CommandAsync(
-            execute: async (progress, cts) =>
-            {
-                //_cts = new();                
-                //var progress = new Progress<double>(p => ProgressValue = p);
-                //try
-                //{
-                await OperationAsync(10);
-                //await OperationAsync(10, progress, cts);
-                //}
-                //catch (OperationCanceledException)
-                //{
-                //    ProgressValue = 0;
-                //}
-
-            }
-        );
-
-    //private CommandBase? _testCommand3;
-    //public CommandBase TestCommand3 =>
-    //    _testCommand3 ??= new CommandBase(
-    //        execute: () => _cts.Cancel()
-    //    );
-
+    public ICommand TestCommand2 => _testCommand2 ??= new CommandAsync(
+        execute: async (progress, cts) => await OperationAsync(10, progress, cts)
+    );
 
     public async Task OperationAsync(
         int secodnd,
-        IProgress<double> progress = null,
+        IProgress<double>? progress = null,
         CancellationToken cancellationToken = default
         )
     {

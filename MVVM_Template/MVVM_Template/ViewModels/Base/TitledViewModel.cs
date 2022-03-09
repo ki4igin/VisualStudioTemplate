@@ -1,4 +1,4 @@
-﻿namespace MVVM_Template.ViewModels;
+﻿namespace MVVM_Template.ViewModels.Base;
 
 public abstract class TitledViewModel : ViewModelBase
 {
