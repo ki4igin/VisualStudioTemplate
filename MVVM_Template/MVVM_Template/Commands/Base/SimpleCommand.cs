@@ -14,13 +14,13 @@ public class SimpleCommand : CommandBase
         this(execute, () => true)
     { }
     public SimpleCommand(Action execute, Func<bool> canExecute) :
-        this((obj) => execute(), (obj) => canExecute())
+        this(_ => execute(), _ => canExecute())
     { }
     public SimpleCommand(Action<object?> execute, Func<bool> canExecute) :
-        this(execute, (obj) => canExecute())
+        this(execute, _ => canExecute())
     { }
     public SimpleCommand(Action execute, Func<object?, bool> canExecute) :
-        this((obj) => execute(), canExecute)
+        this(_ => execute(), canExecute)
     { }
     public SimpleCommand(Action<object?> execute, Func<object?, bool> canExecute)
     {
@@ -28,10 +28,10 @@ public class SimpleCommand : CommandBase
         _canExecute = canExecute;
     }
 
-    public override bool CanExecute(object? parameter) =>
+    protected override bool CanExecute(object? parameter) =>
         _canExecute(parameter);
 
-    public override void Execute(object? parameter)
+    protected override void Execute(object? parameter)
     {
         if (CanExecute(parameter) is false)
             return;
@@ -52,13 +52,13 @@ public class SimpleCommand<T> : CommandBase
         this(execute, () => true)
     { }
     public SimpleCommand(Action execute, Func<bool> canExecute) :
-        this((obj) => execute(), (obj) => canExecute())
+        this(_ => execute(), _ => canExecute())
     { }
     public SimpleCommand(Action<T> execute, Func<bool> canExecute) :
-        this(execute, (obj) => canExecute())
+        this(execute, _ => canExecute())
     { }
     public SimpleCommand(Action execute, Func<T, bool> canExecute) :
-        this((obj) => execute(), canExecute)
+        this(_ => execute(), canExecute)
     { }
     public SimpleCommand(Action<T> execute, Func<T, bool> canExecute)
     {
@@ -66,12 +66,12 @@ public class SimpleCommand<T> : CommandBase
         _canExecute = canExecute;
     }
 
-    public override bool CanExecute(object? parameter) =>
+    protected override bool CanExecute(object? parameter) =>
         _canExecute(ConvertParameter(parameter));
 
-    public override void Execute(object? parameter)
+    protected override void Execute(object? parameter)
     {
-        var param = ConvertParameter(parameter);
+        T param = ConvertParameter(parameter);
         if (CanExecute(param) is false)
             return;
 
@@ -80,10 +80,13 @@ public class SimpleCommand<T> : CommandBase
 
     private static T ConvertParameter(object? parameter)
     {
-        if (parameter is null)
-            throw new ArgumentNullException("В команде нет параметра");
-        if (parameter is T result)
-            return result;
+        switch (parameter)
+        {
+            case null:
+                throw new ArgumentNullException($"Сommand has no parameters");
+            case T result:
+                return result;
+        }
 
         Type commandType = typeof(T);
         Type parameterType = parameter.GetType();
@@ -95,9 +98,9 @@ public class SimpleCommand<T> : CommandBase
         if (commandTypeConverter.CanConvertFrom(parameterType))
             return (T)commandTypeConverter.ConvertFrom(parameter)!;
 
-        TypeConverter? parameter_converter = TypeDescriptor.GetConverter(parameterType);
-        if (parameter_converter.CanConvertTo(commandType))
-            return (T)parameter_converter.ConvertFrom(parameter)!;
+        TypeConverter? parameterConverter = TypeDescriptor.GetConverter(parameterType);
+        if (parameterConverter.CanConvertTo(commandType))
+            return (T)parameterConverter.ConvertFrom(parameter)!;
 
         return default!;
     }

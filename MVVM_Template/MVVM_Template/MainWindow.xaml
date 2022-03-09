@@ -27,6 +27,5 @@
                               CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"/>
             </Button.InputBindings>
         </Button>
-
     </StackPanel>
 </Window>

@@ -17,7 +17,7 @@ public class CommandAsync : CommandBase
     private ICommand? _cancel;
     public ICommand Cancel => _cancel ??= new SimpleCommand(
         execute: () => _cts.Cancel(),
-        canExecute: () => IsExecuting is true
+        canExecute: () => IsExecuting
     );
     #endregion
 
@@ -28,7 +28,7 @@ public class CommandAsync : CommandBase
         get => _isExecuting;
         set
         {
-            if (Set(ref _isExecuting, value) is true)
+            if (Set(ref _isExecuting, value))
                 CommandManager.InvalidateRequerySuggested();
         }
     }
@@ -40,28 +40,28 @@ public class CommandAsync : CommandBase
     #endregion
 
     public CommandAsync(Func<Progress<double>, CancellationToken, Task> execute) :
-        this((obj, pros, ct) => execute(pros, ct), (obj) => true)
+        this((_, pros, ct) => execute(pros, ct), _ => true)
     { }
     public CommandAsync(Func<object?, Progress<double>, CancellationToken, Task> execute) :
-        this(execute, (obj) => true)
+        this(execute, _ => true)
     { }
     public CommandAsync(
         Func<Progress<double>, CancellationToken, Task> execute,
         Func<bool> canExecute
         ) :
-        this((obj, pros, ct) => execute(pros, ct), (obj) => canExecute())
+        this((_, pros, ct) => execute(pros, ct), _ => canExecute())
     { }
     public CommandAsync(
         Func<object?, Progress<double>, CancellationToken, Task> execute,
         Func<bool> canExecute
         ) :
-        this(execute, (obj) => canExecute())
+        this(execute, _ => canExecute())
     { }
     public CommandAsync(
         Func<Progress<double>, CancellationToken, Task> execute,
         Func<object?, bool> canExecute
         ) :
-        this((obj, pros, ct) => execute(pros, ct), canExecute)
+        this((_, pros, ct) => execute(pros, ct), canExecute)
     { }
     public CommandAsync(
         Func<object?, Progress<double>, CancellationToken, Task> execute,
@@ -74,10 +74,10 @@ public class CommandAsync : CommandBase
         _progress = new Progress<double>(p => ProgressValue = p);
     }
 
-    public override bool CanExecute(object? parameter) =>
+    protected override bool CanExecute(object? parameter) =>
         _canExecute(parameter) && IsExecuting is false;
 
-    public override async void Execute(object? parameter)
+    protected override async void Execute(object? parameter)
     {
         if (CanExecute(parameter) is false)
             return;

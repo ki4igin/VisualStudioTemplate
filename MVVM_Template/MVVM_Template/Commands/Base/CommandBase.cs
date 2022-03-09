@@ -14,9 +14,9 @@ public abstract class CommandBase : ICommand, INotifyPropertyChanged, IDisposabl
         remove => CommandManager.RequerySuggested -= value;
     }
 
-    public virtual bool CanExecute(object? parameter) => true;
+    protected virtual bool CanExecute(object? parameter) => true;
 
-    public abstract void Execute(object? parameter);
+    protected abstract void Execute(object? parameter);
 
     #region ICommand implementations
     bool ICommand.CanExecute(object? parameter) =>
@@ -29,13 +29,14 @@ public abstract class CommandBase : ICommand, INotifyPropertyChanged, IDisposabl
     #region INotifyPropertyChanged implementations
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "") =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     protected bool Set<T>(ref T field, T value, [CallerMemberName] string propertyName = "")
     {
-        if (EqualityComparer<T>.Default.Equals(field, value) is true)
+        if (EqualityComparer<T>.Default.Equals(field, value))
             return false;
+        
         field = value;
         OnPropertyChanged(propertyName);
         return true;

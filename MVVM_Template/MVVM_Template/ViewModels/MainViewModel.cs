@@ -35,26 +35,10 @@ public class MainViewModel : TitledViewModel
 
 
 
-    private ICommand? _testCommand;
-    public ICommand TestCommand => _testCommand ??= new SimpleCommand<string>(
-        execute: async (val) =>
-        {
-            Counter++;
-            await Task.Delay(1000);
-        },
-        canExecute: () => Counter % 2 == 0
-     );
-
-    private ICommand? _testCommand1;
-    public ICommand TestCommand1 =>
-        _testCommand1 ??= new SimpleCommand(
-            execute: () => Counter++
-        );
-
     //CancellationTokenSource _cts;
-
-    private ICommand? _testCommand2;
-    public ICommand TestCommand2 => _testCommand2 ??= new CommandAsync(
+    
+    private CommandAsync? _testCommand2;
+    public CommandAsync TestCommand2 => _testCommand2 ??= new CommandAsync(
         execute: async (progress, cts) => await OperationAsync(10, progress, cts)
     );
 

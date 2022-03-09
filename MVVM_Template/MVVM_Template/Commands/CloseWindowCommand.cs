@@ -5,8 +5,9 @@ namespace MVVM_Template.Commands;
 
 public class CloseWindowCommand : CommandBase
 {
-    public override bool CanExecute(object? parameter) =>
+    protected override bool CanExecute(object? parameter) =>
         parameter is Window;
-    public override void Execute(object? parameter) =>
+
+    protected override void Execute(object? parameter) =>
         (parameter as Window)?.Close();
 }
